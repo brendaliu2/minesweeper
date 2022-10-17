@@ -22,11 +22,11 @@ export default function Board({
   gameId
 }) {
   console.log('board', board);
-  console.log('displayBoard', newDisplayBoard);
 
-  // const [board, setBoard] = useState(newBoard);
   const [displayBoard, setDisplayBoard] = useState(newDisplayBoard);
   const [gameOver, setGameOver] = useState(false);
+  const [flagMode, setFlagMode] = useState(false);
+  const [flaggedCells, setFlaggedCells] = useState(new Set());
 
   function revealCell(x, y) {
     if (board[x][y] === '🐰') {
@@ -59,9 +59,19 @@ export default function Board({
     return newDisplayBoard;
   }
 
+  function toggleFlag(x, y) {
+    const newFlaggedCells = new Set(JSON.parse(
+      JSON.stringify(Array.from(flaggedCells))
+    ));
+
+    newFlaggedCells.has([x, y]) ? newFlaggedCells.delete([x, y]) : newFlaggedCells.add([x, y]);
+
+    setFlaggedCells(newFlaggedCells);
+  }
+
   return (
     <>
-      <h2>Board Here.</h2>
+      <button onClick={() => setFlagMode(f => !f)}>{flagMode ? "Flags Off" : "Flags On"}</button>
       {gameOver ?
         <>
           <h2>You Lost!</h2>
@@ -94,9 +104,10 @@ export default function Board({
                       x={x}
                       y={y}
                       revealCell={revealCell}
-                    >
-                      {""}
-                    </HiddenCell>
+                      flagMode={flagMode}
+                      toggleFlag={toggleFlag}
+                      flaggedCells={flaggedCells}
+                    />
                 )}
               </tr>)}
             </tbody>
